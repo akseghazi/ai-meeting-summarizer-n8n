@@ -89,7 +89,7 @@ Shows the complete automation workflow from the meeting transcript webhook throu
 
 Each extracted action item is automatically stored as a separate row in Google Sheets.
 
-![Google Sheets Output](screenshots/google-sheets.png)
+![image alt](https://github.com/akseghazi/ai-meeting-summarizer-n8n/blob/d83fe447ba9ec6817aa082390b72e71c65f1a9de/screenshots/data%20storing%20in%20google%20sheets.jpg)
 
 ### 3. Automated Email Report
 
