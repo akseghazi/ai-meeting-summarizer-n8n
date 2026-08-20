@@ -83,7 +83,7 @@ The entire process is automated using **n8n**.
 
 Shows the complete automation workflow from the meeting transcript webhook through AI processing, task extraction, Google Sheets, and Gmail.
 
-![Complete n8n Workflow](screenshots/workflow.png)
+![image alt](https://github.com/akseghazi/ai-meeting-summarizer-n8n/blob/ddb87586d049c6e9ba41776608577a3ea4abf597/screenshots/complete%20workflow.jpg)
 
 ---
 
