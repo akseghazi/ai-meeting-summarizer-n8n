@@ -1,0 +1,304 @@
+{
+  "name": "AI Meeting Summarizer & Task Extractor",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "meeting-transcript",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6119776d-987a-48d0-bfd8-57850251bdc9",
+      "name": "Webhook",
+      "webhookId": "90d4d036-07fa-462e-9df8-b2eec7629156"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the following meeting transcript.\n\nYour job is to:\n\n1. Generate a short, descriptive title for the meeting based on the main topic discussed.\n2. Create a concise and accurate meeting summary.\n3. Extract every actionable task from the meeting.\n4. Identify the person responsible for each task.\n5. Identify the deadline if one is mentioned.\n6. If a person or deadline is not mentioned, write \"Not specified\".\n7. Do not invent information.\n8. Return the information according to the required output structure.\n\nMeeting transcript:\n\n{{ $json.body.transcript }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "b707a3d4-ebd9-4237-aa11-3d329fa67684",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.6-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        208
+      ],
+      "id": "84f9ce43-5f38-4867-81a2-d12ff9664afc",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "RabLG0MaIiBPWEfJ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"meeting_title\": {\n      \"type\": \"string\"\n    },\n    \"summary\": {\n      \"type\": \"string\"\n    },\n    \"action_items\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"person\": {\n            \"type\": \"string\"\n          },\n          \"task\": {\n            \"type\": \"string\"\n          },\n          \"deadline\": {\n            \"type\": \"string\"\n          }\n        },\n        \"required\": [\n          \"person\",\n          \"task\",\n          \"deadline\"\n        ]\n      }\n    }\n  },\n  \"required\": [\n    \"meeting_title\",\n    \"summary\",\n    \"action_items\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        384,
+        208
+      ],
+      "id": "4f9b2e73-a1e7-425e-b759-6d33386a2cd8",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output.action_items",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        544,
+        0
+      ],
+      "id": "73c0fd5c-b8b7-4679-aa27-e9e04c8159cf",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1y0NhiDFVSyKHs0BfJVXfnzbZmSwBzp3zF0ZrWtyfah8",
+          "mode": "list",
+          "cachedResultName": "AI Meeting Tasks",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1y0NhiDFVSyKHs0BfJVXfnzbZmSwBzp3zF0ZrWtyfah8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1y0NhiDFVSyKHs0BfJVXfnzbZmSwBzp3zF0ZrWtyfah8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Meeting": "={{ $json.output.meeting_title }}",
+            "Person": "={{ $json['output.action_items'].person }}",
+            "Deadline": "={{ $json['output.action_items'].deadline }}",
+            "Task": "={{ $json['output.action_items'].task }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Meeting",
+              "displayName": "Meeting",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Person",
+              "displayName": "Person",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Task",
+              "displayName": "Task",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Deadline",
+              "displayName": "Deadline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        800,
+        0
+      ],
+      "id": "f355d1f5-fa22-4a74-bd90-994cc7b4bae9",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "s3KJloaOysfg5RS5",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst meetingTitle = items[0].json.output.meeting_title;\nconst summary = items[0].json.output.summary;\n\nconst taskText = items.map((item, index) => {\n  const task = item.json[\"output.action_items\"];\n\n  return `${index + 1}. ${task.person} — ${task.task} — Deadline: ${task.deadline}`;\n}).join('\\n');\n\nreturn [\n  {\n    json: {\n      meetingTitle: meetingTitle,\n      summary: summary,\n      taskText: taskText\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        192
+      ],
+      "id": "c27c4614-9f41-4afe-8453-46031c6428b7",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "sendTo": "ghaziaks05@gmail.com",
+        "subject": "={{ $json.meetingTitle }}",
+        "emailType": "text",
+        "message": "=AI MEETING SUMMARY  {{ $json.summary }}   ACTION ITEMS  {{ $json.taskText }}   This meeting summary was automatically generated by the AI Meeting Summarizer & Task Extractor.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        992,
+        192
+      ],
+      "id": "c5dae6c3-69d2-467d-9f9c-394443943363",
+      "name": "Send a message",
+      "webhookId": "24625e6b-8bda-401a-b2fb-e2861ed6cd39",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "QHseG8VxhFUt6izg",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "5e367ab2-7d93-4b86-814b-7a8f4cb44b0c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f1eaa398250805bb48ff8807fca555385123943c3be6996a85e9e70aaae1de9c"
+  },
+  "nodeGroups": [],
+  "id": "N7FfFFN66HJfyUle",
+  "tags": []
+}
