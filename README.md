@@ -85,29 +85,17 @@ Shows the complete automation workflow from the meeting transcript webhook throu
 
 ![image alt](https://github.com/akseghazi/ai-meeting-summarizer-n8n/blob/ddb87586d049c6e9ba41776608577a3ea4abf597/screenshots/complete%20workflow.jpg)
 
----
-
-### 2. AI Structured Output
-
-The AI analyzes the meeting transcript and returns a structured meeting title, summary, and action items.
-
-![AI Structured Output](screenshots/ai-output.png)
-
----
-
-### 3. Google Sheets Task Management
+### 2. Google Sheets Task Management
 
 Each extracted action item is automatically stored as a separate row in Google Sheets.
 
 ![Google Sheets Output](screenshots/google-sheets.png)
 
----
-
-### 4. Automated Email Report
+### 3. Automated Email Report
 
 The final meeting summary and action items are automatically sent through Gmail.
 
-![Email Output](screenshots/email-output.png)
+![image alt](https://github.com/akseghazi/ai-meeting-summarizer-n8n/blob/67e06ede51852a6eb46091ac3656c09f3beee0c2/screenshots/automatically%20generated%20mail.jpg)
 
 ---
 
